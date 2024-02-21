@@ -211,16 +211,20 @@ stack-create() {
     stack-tail $stack
   else
     echo "stack creation failed because $output"
-    for capability in ${list_capabilities} ; do
-      if [[ $output ==  *"$capability"* ]] ; then
-        capabilities="${capabilities} ${capability}"
+    if [[ $output == *"InsufficientCapabilitiesException"* ]] ; then
+      for capability in ${list_capabilities} ; do
+        if [[ $output ==  *"$capability"* ]] ; then
+          capabilities="${capabilities} ${capability}"
+        fi
+      done
+      if [[ $capabilities ]] ; then
+        local regex_yes="^[Yy]$"
+        read -p "Do you want to try again with these capabilities? " -n 1 -r
+        echo
+        [[ $REPLY =~ $regex_yes ]] || return 0
+        stack-create $@ ${capabilities}
       fi
-    done
-      local regex_yes="^[Yy]$"
-      read -p "Do you want to try again with these capabilities? " -n 1 -r
-      echo
-      [[ $REPLY =~ $regex_yes ]] || return 0
-      stack-create $@ ${capabilities}
+    fi
   fi
 
 
