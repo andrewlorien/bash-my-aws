@@ -220,7 +220,6 @@ stack-create() {
       read -p "Do you want to try again with these capabilities? " -n 1 -r
       echo
       [[ $REPLY =~ $regex_yes ]] || return 0
-      echo "now what?"
       stack-create $@ ${capabilities}
   fi
 
