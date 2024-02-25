@@ -96,10 +96,10 @@ alias deployments-group='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma deployments-gro
 alias distributions='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma distributions'
 alias ecr-repositories='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecr-repositories'
 alias ecr-repository-images='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecr-repository-images'
-alias ecs-clusters2='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecs-clusters2'
+alias ecs-clusters='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecs-clusters'
 alias ecs-scaling-actions='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecs-scaling-actions'
 alias ecs-scaling-activities='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecs-scaling-activities'
-alias ecs-services2='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecs-services2'
+alias ecs-services='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecs-services'
 alias ecs-tasks='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma ecs-tasks'
 alias elasticache-replication-groups='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma elasticache-replication-groups'
 alias elasticaches='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma elasticaches'
@@ -275,7 +275,7 @@ alias vpcs='${BMA_HOME:-$HOME/.bash-my-aws}/bin/bma vpcs'
 # We'll find a less suprising place for this in future
 # region() needs to be a function in order to let it
 # set AWS_DEFAULT_REGION in the current shell
-function region() { 
+function region() {
     local inputs=$(skim-stdin "$@");
     if [[ -z "$inputs" ]]; then
         echo "${AWS_DEFAULT_REGION:-'AWS_DEFAULT_REGION not set'}";

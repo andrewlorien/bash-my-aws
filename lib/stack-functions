@@ -140,7 +140,7 @@ stack-create() {
   # to take advantage of shorter commands*
   #
   #     USAGE: stack-create stack [template-file] [parameters-file]             \
-  #                 [--capabilities=OPTIONAL_VALUE] [--role-arn=OPTIONAL_VALUE]
+  #                 [CAPABILITY_1 CAPABILITY_2] [--role-arn=OPTIONAL_VALUE]
   #
   #     $ stack-create params/asg-params-prod.json
   #     Resolved arguments: asg-prod ./asg.yml params/asg-params-prod.json
@@ -177,30 +177,53 @@ stack-create() {
   local inputs_array=($@)
   local IFS='=' # override default field separator in the scope of this function only
   local regex_role_arn="^\-\-role\-arn=.*"
-  local regex_capabilities="^\-\-capabilities=.*"
+  local list_capabilities=("CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND")
+
   for index in "${inputs_array[@]}" ; do
     if [[ "$index" =~ $regex_role_arn ]] ; then
       read arn_opt arn_arg <<< "$index" # ignore anything after option + arg
       arn="--role-arn $arn_arg"
-    elif [[ "$index" =~ $regex_capabilities ]] ; then
-      read caps_opt caps_arg <<< "$index" # ignore anything after option + arg
-      capabilities="--capabilities $caps_arg"
+    fi
+    # search for anything in the capabilities list, with or without "--capabilities"
+    test_capability=${index##* }
+    if [[ " $list_capabilities " =~  "$test_capability" ]] ; then
+      capabilities="${capabilities} ${test_capability}"
     fi
   done
-  echo "this should capture all capabilities: $capabilities"
+  if [ ! -z "${capabilities}" ] ; then
+    capabilities="--capabilities ${capabilities}"
+  fi
+  ## TODO: add capabilities shell completion
 
   unset IFS # to prevent it from breaking things later
 
-  if aws cloudformation create-stack \
+  if output=$(
+    aws cloudformation create-stack \
     --stack-name $stack              \
     --template-body file://$template \
     $parameters                      \
     $capabilities                    \
     $arn                             \
     --disable-rollback               \
-    --output text; then
+    --output text                    \
+     2>&1
+  ); then
     stack-tail $stack
+  else
+    echo "stack creation failed because $output"
+    for capability in ${list_capabilities} ; do
+      if [[ $output ==  *"$capability"* ]] ; then
+        capabilities="${capabilities} ${capability}"
+      fi
+    done
+      local regex_yes="^[Yy]$"
+      read -p "Do you want to try again with these capabilities? " -n 1 -r
+      echo
+      [[ $REPLY =~ $regex_yes ]] || return 0
+      stack-create $@ ${capabilities}
   fi
+
+
 }
 
 stack-update() {
