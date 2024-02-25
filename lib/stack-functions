@@ -187,6 +187,8 @@ stack-create() {
       capabilities="--capabilities $caps_arg"
     fi
   done
+  echo "this should capture all capabilities: $capabilities"
+
   unset IFS # to prevent it from breaking things later
 
   if aws cloudformation create-stack \
