@@ -210,11 +210,7 @@ stack-create() {
   ); then
     stack-tail $stack
   else
-<<<<<<< HEAD
     echo "$output"
-=======
-    echo "stack creation failed because $output"
->>>>>>> features/stack-capabilities
     if [[ $output == *"InsufficientCapabilitiesException"* ]] ; then
       for capability in ${list_capabilities} ; do
         if [[ $output ==  *"$capability"* ]] ; then
