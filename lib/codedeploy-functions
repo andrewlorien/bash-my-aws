@@ -1,0 +1,54 @@
+#!/bin/bash
+# shellcheck disable=SC2046
+# shellcheck disable=SC2155
+#
+# codedeploy-functions
+
+deployment() {
+
+  # List deployments
+
+  local deploymentgroup_names=$(skim-stdin)
+  local filters=$(__bma_read_filters $@)
+
+# aws deploy list-applications
+# aws deploy list-deployment-groups --application-name 'tenders-web-dev2'
+# list-deployments (limit to last 24 hours or most recent 5??)
+# aws deploy list-deployments --deployment-group-name gc3-test2 --application-name grants-web-gc3-test2 --include-only-statuses "Succeeded" --query 'deployments[0]'
+# aws deploy get-deployment --deployment-id d-MLWOBA1PK
+  aws deploy list-deployments              \
+    ${asg_names/#/'--auto-scaling-group-names '}            \
+    --output text                                           \
+    --query "AutoScalingGroups[].[
+      AutoScalingGroupName,
+      join(',', [Tags[?Key=='Name'].Value || 'NO_NAME'][]),
+      CreatedTime,
+      join(',' sort(AvailabilityZones))
+    ]"                  |
+  grep -E -- "$filters" |
+  sort -k 3             |
+  column -s$'\t' -t
+}
+
+
+deployment-groups() {
+
+  # List min, desired and maximum capacities of EC2 Autoscaling Group(s)
+
+  local asg_names=$(skim-stdin "$@")
+  [[ -z $asg_names ]] && __bma_usage "asg_name [asg_name]" && return 1
+
+  # shellcheck disable=SC2086
+  aws autoscaling describe-auto-scaling-groups \
+    --auto-scaling-group-names $asg_names      \
+    --output text                              \
+    --query "AutoScalingGroups[][
+      AutoScalingGroupName,
+      MinSize,
+      DesiredCapacity,
+      MaxSize
+    ]"              |
+  column -s$'\t' -t
+}
+
+

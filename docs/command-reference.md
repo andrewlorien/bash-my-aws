@@ -1361,15 +1361,9 @@ List logging status of Cloudtrails
 List deployments
 
 
-### deployments
-
-List all deployment IDs for a deployment group (not useful for the user, only internal)
-# ?? if no deployment group, could we list all deployments for this application, with their groups and statuses?
-
-
 ### deployment-groups
 
-List all deployment groups for an application
+List min, desired and maximum capacities of EC2 Autoscaling Group(s)
 
 
 ## ecr-commands
@@ -1434,7 +1428,7 @@ if you do pass a filter, it filters on the task name.  All clusters are included
 
 ### ecs-scaling-activities
 
-LIst autoscaling activities - the actual scaling events that have happened
+List autoscaling activities - the actual scaling events that have happened
 eg
 ecs-scaling www
 2023-11-22T06:24:50.937000+11:00        www-ecs-public-ServicePublic-OuN3rXBLvmx3-AlarmLow-64de4512-d901-4b26-a6a2-184bb1e90bc6 in state ALARM triggered policy www-ecs-public-target-tracking-mem70     Successfully set desired count to 2. Change successfully fulfilled by ecs.
@@ -1469,6 +1463,28 @@ Accepts a string to filter on
 This is not very useful without column headings.
 Most of the things you want to know about a replication group are boolean
 eg AutomaticFailover, MultiAZClusterEnabled, AtRestEncryptionEnabled etc
+
+
+## elasticache-commands-littlelaptop
+
+
+### elasticaches
+
+List elasticache thingies
+
+    $ target-groups
+    bash-my-aws-nlb-tg  TCP   22   vpc-04636ebe5573f6f65  instance  bash-my-aws-nlb
+    bash-my-aws-alb-tg  HTTP  443  vpc-04636ebe5573f6f65  instance  bash-my-aws-alb
+
+
+### elasticache-replication-groups
+
+
+Accepts Target Group names on stdin or as arguments
+
+    $ target-group-targets bash-my-aws-nlb-tg
+    i-4e15ece1de1a3f869  443  healthy    bash-my-aws-nlb-tg
+    i-89cefa9403373d7a5  443  unhealthy  bash-my-aws-nlb-tg
 
 
 ## elb-commands
@@ -1605,28 +1621,6 @@ List target groups of ELBv2(s) [Application and Network Load Balancers)
     $ elbv2s | elbv2-target-groups
     bash-my-aws-nlb-tg  TCP   22   vpc-018d9739  bash-my-aws-nlb
     bash-my-aws-alb-tg  HTTP  443  vpc-018d9739  bash-my-aws-alb
-
-
-## fargate-commands
-
-
-### fargate-clusters
-
-List ECS clusters
-
-
-### fargate-services
-
-List ECS services
-gets all clusters if no cluster_names passed in
-echo "cluster_names=$cluster_names"
-
-
-### fargate-tasks
-
-List ECS services
-gets all clusters if no cluster_names passed in
-echo "service_names=$service_names"
 
 
 ## iam-commands
@@ -2098,24 +2092,24 @@ Run a command locally on EC2 instance(s) running Windows
     $ ssm-instances Windows | ssm-send-command-windows Get-Hotfix
     Command ID: a0eeeddc-2edf-42bc-b0c7-122f5bc50956
     Waiting for command to complete...
-    i-0fake1234abcd                                                                           
-       Source        Description      HotFixID      InstalledBy          InstalledOn              
-       ------        -----------      --------      -----------          -----------              
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
-       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM     
-       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM    
-       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM    
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM    
-       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM   
-    ---Output truncated---                                                                        
-    i-0fake1234abcd                                                                           
-       Source        Description      HotFixID      InstalledBy          InstalledOn              
-       ------        -----------      --------      -----------          -----------              
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+    i-0fake1234abcd
+       Source        Description      HotFixID      InstalledBy          InstalledOn
+       ------        -----------      --------      -----------          -----------
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM
+       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM
+       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM
+       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM
+    ---Output truncated---
+    i-0fake1234abcd
+       Source        Description      HotFixID      InstalledBy          InstalledOn
+       ------        -----------      --------      -----------          -----------
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
 
     See also: ssm-send-command-windows
 

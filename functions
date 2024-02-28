@@ -92,7 +92,6 @@ debug
 deployment
 deployment-delete-danger
 deployment-groups
-deployments
 deployments-group
 distributions
 ecr-repositories
@@ -117,9 +116,6 @@ elbv2-dnsname
 elbv2-subnets
 elbv2-target-groups
 elbv2s
-fargate-clusters
-fargate-services
-fargate-tasks
 hosted-zone-a-records
 hosted-zone-ns-records
 hosted-zones
