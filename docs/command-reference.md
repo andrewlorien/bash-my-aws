@@ -1361,9 +1361,34 @@ List logging status of Cloudtrails
 List deployments
 
 
+### deployments
+
+List all deployment IDs for a deployment group (not useful for the user, only internal)
+# ?? if no deployment group, could we list all deployments for this application, with their groups and statuses?
+
+
 ### deployment-groups
 
-List min, desired and maximum capacities of EC2 Autoscaling Group(s)
+List all deployment groups for an application
+
+
+## codedeploy-commands.bak
+
+
+### deployment
+
+List deployments
+
+
+### deployments
+
+List all deployment IDs for a deployment group (not useful for the user, only internal)
+# ?? if no deployment group, could we list all deployments for this application, with their groups and statuses?
+
+
+### deployment-groups
+
+List all deployment groups for an application
 
 
 ## ecr-commands
@@ -2092,24 +2117,24 @@ Run a command locally on EC2 instance(s) running Windows
     $ ssm-instances Windows | ssm-send-command-windows Get-Hotfix
     Command ID: a0eeeddc-2edf-42bc-b0c7-122f5bc50956
     Waiting for command to complete...
-    i-0fake1234abcd
-       Source        Description      HotFixID      InstalledBy          InstalledOn
-       ------        -----------      --------      -----------          -----------
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
-       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM
-       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM
-       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM
-       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM
-    ---Output truncated---
-    i-0fake1234abcd
-       Source        Description      HotFixID      InstalledBy          InstalledOn
-       ------        -----------      --------      -----------          -----------
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+    i-0fake1234abcd                                                                           
+       Source        Description      HotFixID      InstalledBy          InstalledOn              
+       ------        -----------      --------      -----------          -----------              
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM     
+       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM    
+       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM    
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM    
+       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM   
+    ---Output truncated---                                                                        
+    i-0fake1234abcd                                                                           
+       Source        Description      HotFixID      InstalledBy          InstalledOn              
+       ------        -----------      --------      -----------          -----------              
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
 
     See also: ssm-send-command-windows
 

@@ -92,6 +92,7 @@ debug
 deployment
 deployment-delete-danger
 deployment-groups
+deployments
 deployments-group
 distributions
 ecr-repositories
