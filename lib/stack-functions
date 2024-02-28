@@ -198,6 +198,22 @@ stack-create() {
     --disable-rollback               \
     --output text; then
     stack-tail $stack
+  else
+    echo "$output"
+    if [[ $output == *"InsufficientCapabilitiesException"* ]] ; then
+      for capability in ${list_capabilities} ; do
+        if [[ $output ==  *"$capability"* ]] ; then
+          capabilities="${capabilities} ${capability}"
+        fi
+      done
+      if [[ $capabilities ]] ; then
+        local regex_yes="^[Yy]$"
+        read -p "Do you want to try again with these capabilities? " -n 1 -r
+        echo
+        [[ $REPLY =~ $regex_yes ]] || return 0
+        stack-create $@ ${capabilities}
+      fi
+    fi
   fi
 }
 
@@ -1055,7 +1071,8 @@ _bma_stack_args(){
     __bma_error "Could not find params file (${params})."
   else
     # Display calling (or current if none) with expanded arguments
-    echo "Resolved arguments: $stack $template $params"
+    # echo "Resolved arguments: $stack $template $params"
+    true
   fi
 }
 
