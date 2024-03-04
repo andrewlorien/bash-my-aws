@@ -386,18 +386,21 @@ stack-failure() {
   # Return reason a stack failed to update/create/delete
 
   local inputs=$(skim-stdin "$@")
-  local stack=$(_bma_stack_name_arg ${inputs})
-  [[ -z "${stack}" ]] && __bma_usage "stack" && return 1
+  for input in $inputs; do
+    local stack=$(_bma_stack_name_arg ${input})
+    [[ -z "${stack}" ]] && __bma_usage "stack" && return 1
 
-  aws cloudformation describe-stack-events \
-    --stack-name ${stack}                  \
-    --query "
-      StackEvents[?contains(ResourceStatus,'FAILED')].[
-        PhysicalResourceId,
-        Timestamp,
-        ResourceStatusReason
-      ]" \
-    --output text
+    aws cloudformation describe-stack-events \
+      --stack-name ${stack}                  \
+      --query "
+        StackEvents[?contains(ResourceStatus,'FAILED')].[
+          PhysicalResourceId,
+          Timestamp,
+          ResourceStatusReason
+        ]" \
+      --output text
+    echo
+  done
 }
 
 stack-events() {
