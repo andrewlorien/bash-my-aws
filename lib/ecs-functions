@@ -52,10 +52,10 @@ ecs-services() {
 #  check for input that isn't a valid cluster name and use it as a regex...
   if [[ -z "$cluster_names" || "$(aws ecs describe-clusters --clusters $cluster_names --query "failures[].reason" --output text)" == "MISSING" ]]; then
     echo "cluster not found, using input to search"
-    cluster_names=$(ecs-clusters2 $cluster_names |skim-stdin)
+    cluster_names=$(ecs-clusters $cluster_names |skim-stdin)
     if [[ -z "$cluster_names" ]]; then
       echo "no matching cluster, using input as a service filter"
-      cluster_names=$(ecs-clusters2 |skim-stdin)
+      cluster_names=$(ecs-clusters |skim-stdin)
       service_filter=$filter
     fi
   fi
@@ -119,7 +119,7 @@ ecs-tasks() {
 
   local filter=$(skim-stdin "$@")
 
-  for cluster_name in $(ecs-clusters2 |skim-stdin); do
+  for cluster_name in $(ecs-clusters |skim-stdin); do
    #echo "cluster_name=$cluster_name"
    # TODO: remove the account bit from the task definition, ie print gc3-test1-public:27 instead of arn:aws:ecs:ap-southeast-2:167642850091:task-definition/gc3-test1-public:27
       aws ecs describe-tasks            \
