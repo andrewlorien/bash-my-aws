@@ -37,3 +37,18 @@ log-groups() {
   $column_command
 }
 
+
+log-group-delete() {
+
+  # List CloudWatch Log Groups
+  #
+  #     $ log-group-delete [log-group-name] [log-group-name] [log-group-name]
+
+  local log_group_names=$(skim-stdin)
+  local log_group
+  [[ -z $log_group_names ]] && __bma_usage "log-group-delete [log_group_names]" && return 1
+  for log_group in log_group_names; do
+    aws logs delete-log-groups    \
+     --log-group-name $(log_group)
+  done
+}
