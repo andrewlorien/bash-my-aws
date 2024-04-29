@@ -1319,6 +1319,16 @@ Return Cert Chain for ACM Cert(s)
     USAGE: cert-chain cert-arn [cert-arn]
 
 
+### cert-resource-record-valid
+
+cert-resource-record-valid - Check if a specified DNS resource record matches the expected value and includes input validation.
+
+Usage: cert-resource-record-valid <name> <type> <value>
+Perform the DNS query
+Print the output of the DNS query
+Check if the expected value is in the output
+
+
 ### cert-verify
 
 Verify ACM cert(s)
@@ -1676,6 +1686,10 @@ List IAM Users
     config-role-ap-southeast-2               AROAI3QHAU3J2CDRNLQHD  2017-02-02T03:03:02Z
     AWSBatchServiceRole                      AROAJJWRGUPTRXTV52TED  2017-03-09T05:31:39Z
     ecsInstanceRole                          AROAJFQ3WMZXESGIKW5YD  2017-03-09T05:31:39Z
+
+
+### iam-access-key-rotate
+
 
 
 ## image-commands
