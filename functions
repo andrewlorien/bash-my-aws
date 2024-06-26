@@ -113,6 +113,7 @@ elb-subnets
 elb-tag
 elb-tags
 elbs
+elbv2-arn
 elbv2-azs
 elbv2-dnsname
 elbv2-subnets

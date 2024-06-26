@@ -192,6 +192,7 @@ complete -F _bma_elbs_completion elb-subnets
 complete -F _bma_elbs_completion elb-tag
 complete -F _bma_elbs_completion elb-tags
 complete -F _bma_elbs_completion elbs
+complete -F _bma_elbv2s_completion elbv2-arn
 complete -F _bma_elbv2s_completion elbv2-azs
 complete -F _bma_elbv2s_completion elbv2-dnsname
 complete -F _bma_elbv2s_completion elbv2-subnets
