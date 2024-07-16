@@ -353,11 +353,39 @@ stack-delete() {
 # Returns key,value pairs for exports from *all* stacks
 # This breaks from convention for bash-my-aws functions
 # TODO Find a way to make it more consistent
+##stack-exports() {
+##  aws cloudformation list-exports     \
+##    --query 'Exports[].[Name, Value]' \
+##    --output text                     |
+##    columnise
+##}
+
+####    --query "StackSummaries[${stack_names:+?contains(['${stack_names// /"','"}'], StackName)}][
+
 stack-exports() {
-  aws cloudformation list-exports     \
-    --query 'Exports[].[Name, Value]' \
-    --output text                     |
-    columnise
+
+  local stacks=$(skim-stdin "$@")
+  local stack
+  for stack in $stacks; do
+echo $stack
+    aws cloudformation list-exports     \
+      --query "
+        Exports[]|[?contains(ExportingStackId, 'idp-prod') == 'true']
+          .[Name,Value]
+      " \
+      --output text |
+      columnise
+  done
+
+
+#      --query "
+#        Exports[]|[?contains(ExportingStackId, '${stack}') == 'true']
+#          .[Name,Value]
+#      " \
+
+##aws cloudformation list-exports --query 'Exports[]|[?contains(ExportingStackId, `idp-prod`) == `true`].[Name,Value]' --output text |
+##columnise
+
 }
 
 stack-recreate() {
