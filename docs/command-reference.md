@@ -513,6 +513,61 @@ determine name of params file to use
 determine what (if any) capabilities a given stack was deployed with
 
 
+### stack-drift-detect
+
+Initiate drift detection for CloudFormation stacks (non-blocking)
+
+    $ stack-drift-detect my-stack
+    my-stack  d290f1ee-6c54-4b01-90e6-d701748f0851  DETECTION_IN_PROGRESS
+
+    $ stacks | stack-drift-detect
+    web-stack   a123b456-7c89-0d12-34e5-678901234567  DETECTION_IN_PROGRESS
+    app-stack   b234c567-8d90-1e23-45f6-789012345678  DETECTION_IN_PROGRESS
+    data-stack  c345d678-9e01-2f34-56a7-890123456789  DETECTION_IN_PROGRESS
+
+Note: This function initiates drift detection and returns immediately.
+Use stack-drift-status to check progress or stack-drift-resources to see results.
+Create temporary directory for results
+Wait for all background jobs to complete
+Collect and display results in order
+
+
+### stack-drift-status
+
+Check the status of drift detection for CloudFormation stacks
+
+    $ stack-drift-status my-stack
+    my-stack  DETECTION_COMPLETE  DRIFTED  2025-08-06T10:30:00Z  120
+
+    $ stacks | stack-drift-status
+    web-stack   DETECTION_COMPLETE     DRIFTED     2025-08-06T09:15:00Z  45
+    app-stack   DETECTION_IN_PROGRESS  UNKNOWN     2025-08-06T09:20:00Z  15
+    data-stack  DETECTION_COMPLETE     IN_SYNC     2025-08-06T09:18:00Z  30
+Create temporary directory for results
+Wait for all background jobs to complete
+Collect and display results in order
+
+
+### stack-drift-resources
+
+List drifted resources in CloudFormation stacks
+
+    $ stack-drift-resources my-stack
+    my-stack  MyBucket         AWS::S3::Bucket        MODIFIED  2025-08-06T10:30:00Z  BucketEncryption
+    my-stack  MyTable          AWS::DynamoDB::Table   DELETED   2025-08-06T10:30:00Z  RESOURCE_DELETED
+
+    $ stacks | stack-drift-resources
+    web-stack   WebBucket       AWS::S3::Bucket        MODIFIED  2025-08-06T09:15:00Z  Tags
+    app-stack   NO_DRIFT_DATA   Run_stack-drift-detect_first
+    data-stack  IN_SYNC         No_drifted_resources_found
+
+Note: This shows results from the most recent drift detection.
+If no drift detection has been run, it will indicate this in the output.
+Create temporary directory for results
+Wait for all background jobs to complete
+Collect and display results in order
+
+
 ## instance-commands
 
 
@@ -674,6 +729,7 @@ Start stopped EC2 Instance(s)
     $ instances postgres | instance-start
     i-a8b8dd6783e1a40cc  PreviousState=stopped  CurrentState=pending
     i-5d74753e210bfe04d  PreviousState=stopped  CurrentState=pending
+aws ec2 wait instance-running --instance-ids "$instance_ids"
 
 
 ### instance-state
@@ -738,6 +794,28 @@ Enable EC2 Instance stop protection
 List tags applied EC2 Instance(s)
 
     USAGE: instance-tags instance-id [instance-id]
+
+    $ instances | instance-tags
+    i-4e15ece1de1a3f869  Name=nagios Role=monitoring Team=platform
+    i-89cefa9403373d7a5  Name=postgres1 Role=database Team=platform
+    i-806d8f1592e2a2efd  Name=postgres2 Role=database Team=platform
+
+Note: For clearer output with one tag per line, see instance-tags-v2
+
+
+### instance-tags-v2
+
+List tags applied EC2 Instance(s)
+
+    USAGE: instance-tags instance-id [instance-id]
+
+    $ instances | instance-tags-v2
+    i-4e15ece1de1a3f869  Name         nagios
+    i-4e15ece1de1a3f869  Role         monitoring
+    i-4e15ece1de1a3f869  Team         platform
+    i-89cefa9403373d7a5  Name         postgres1
+    i-89cefa9403373d7a5  Role         database
+    i-89cefa9403373d7a5  Team         platform
 
 
 ### instance-tag
@@ -1052,6 +1130,10 @@ Create arguments from output of az-cache-items() (if present)
 
 
 
+### subscriptions-each
+
+
+
 ### subscription
 
 
@@ -1197,7 +1279,11 @@ Usage: connector-group-apps CONNECTOR_GROUP [CONNECTOR_GROUP]
 
 ### connector-group-members
 
-Usage: connector-group-apps CONNECTOR_GROUP [CONNECTOR_GROUP]
+Usage: connector-group-members CONNECTOR_GROUP [CONNECTOR_GROUP]
+
+
+### #
+ connector-group-instances
 
 
 ### deployments-group
@@ -1258,6 +1344,68 @@ List routes of all endpoints for Front Door Profile(s)
 
 
 ### deployment-delete-danger
+
+
+
+### private-dns-zones
+
+private-dns-zones - List Azure private DNS zones with details
+
+Usage: private-dns-zones
+
+
+### private-dns-zone-record-sets
+
+
+
+### private-dns-zone-a-record-add
+
+
+
+### private-dns-zone-a-record-delete
+
+
+
+### private-endpoints
+
+private-endpoints - List Azure private endpoints with details
+
+Usage: private-endpoints
+
+
+### private-endpoint-custom-dns-configs
+
+private-endpoint-custom-dns-configs - List Azure customDnsConfigs for private endpoints
+
+Usage: private-endpointcustom-dns-configs
+
+
+### vnets
+
+vnets - List Azure Virtual Networks with details
+
+Usage: list-vnets
+
+
+### vnet-subnets
+
+List subnets in a VNet
+
+  USAGE: vnet-subnets VNET
+
+  $ vnet-subnets my-vnet
+
+
+### vnet-dns-resolvers
+
+List dns resolvers in a VNet
+
+  USAGE: vnet-dns-resolvers VNET
+
+  $ vnet-dns-resolves my-vnet
+
+
+### nics
 
 
 
@@ -1363,6 +1511,39 @@ List logging status of Cloudtrails
     USAGE: cloudtrail-status cloudtrail [cloudtrail]
 
 
+## cloudwatch-commands
+
+
+### cloudwatch-alarms
+
+List Cloudwatch Alarms
+
+   USAGE: cloudwatch-alarms [filter]
+
+   $ things
+   thing-1234567890123  Online  Amazon Linux                              2           192.168.1.10    server001.example.com
+   thing-1234567890124  Offline Amazon Linux                              2           192.168.1.10    server001.example.com
+   thing-1234567890125  Online  Amazon Linux                              2           192.168.1.10    server001.example.com
+
+   *Optionally provide a filter string for a `| grep` effect with tighter columisation:*
+
+   $ things Online
+   i-1234567890123 Online  Microsoft Windows Server 2019 Datacenter  68.0.11111  192.168.1.10    server001.example.com
+   i-1234567890124 Online  Microsoft Windows Server 2022 Datacenter  68.0.11112  192.168.1.20    winserver002.example.com
+
+
+### cloudwatch-alarm-delete
+
+
+
+### cloudwatch-alarm-actions-disable
+
+
+
+### cloudwatch-alarm-actions-enable
+
+
+
 ## codedeploy-commands
 
 
@@ -1382,23 +1563,33 @@ List all deployment IDs for a deployment group (not useful for the user, only in
 List all deployment groups for an application
 
 
-## codedeploy-commands.bak
+## domain-commands
 
 
-### deployment
+### domains
 
-List deployments
+List Route 53 domains sorted by expiry date (soonest last)
+
+USAGE: domains
+
+EXAMPLE:
+    $ domains
+    test.org     2025-11-01  false
+    example.com  2025-10-02  true
 
 
-### deployments
+### domain-autorenew-disable
 
-List all deployment IDs for a deployment group (not useful for the user, only internal)
-# ?? if no deployment group, could we list all deployments for this application, with their groups and statuses?
+Disable auto-renew for Route 53 domains
+
+USAGE: domain-autorenew-disable domain-name [domain-name]
 
 
-### deployment-groups
+### domain-autorenew-enable
 
-List all deployment groups for an application
+Enable auto-renew for Route 53 domains
+
+USAGE: domain-autorenew-enable domain-name [domain-name]
 
 
 ## ecr-commands
@@ -1459,6 +1650,88 @@ if you do pass a filter, it filters on the task name.  All clusters are included
   arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-public:18    2023-09-19T17:51:56.418000+10:00  2048  4096
   arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-admin:20     2023-08-29T10:03:36.956000+10:00  2048  4096
   arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-hangfire:22  2023-09-19T17:11:06.622000+10:00  1024  2048
+
+
+### ecs-scaling-activities
+
+List autoscaling activities - the actual scaling events that have happened
+eg
+ecs-scaling www
+2023-11-22T06:24:50.937000+11:00        www-ecs-public-ServicePublic-OuN3rXBLvmx3-AlarmLow-64de4512-d901-4b26-a6a2-184bb1e90bc6 in state ALARM triggered policy www-ecs-public-target-tracking-mem70     Successfully set desired count to 2. Change successfully fulfilled by ecs.
+2023-11-22T05:25:48.611000+11:00        www-ecs-public-ServicePublic-OuN3rXBLvmx3-AlarmHigh-6408c172-647e-4c0e-aac9-a800cd83317d in state ALARM triggered policy www-ecs-public-target-tracking-mem70    Successfully set desired count to 3. Change successfully fulfilled by ecs.
+
+
+### ecs-scaling-actions
+
+List autoscaling actions - cron-based scheduled scaling
+filter by environment (eg test1) or namespace (eg ecs)
+if you pass an argument, it'll filter for clusters whose ARN contains your text
+
+  $ scaling-ecs 'test.*down'     # list the scale-down times of all our test environments
+
+
+## ecs-commands~
+
+
+### ecs-clusters
+
+List ECS clusters
+output includes clusterName,status,activeServicesCount,runningTasksCount,pendingTasksCount
+if you pass an argument, it'll filter for clusters whose ARN contains your text
+
+  $ ecs-clusters test
+  test-octopus-ecs-cluster  ACTIVE  1  1  0
+  test1-ecs-cluster        ACTIVE  3  1  0
+  test3-ecs-cluster        ACTIVE  3  1  0
+  test2-ecs-cluster        ACTIVE  3  3  0
+
+
+### ecs-services
+
+List ECS services
+output includes serviceName,status,desiredCount,runningCount,pendingCount,createdAt
+
+gets all clusters if no filter passed in
+if you do pass a filter:
+1. if your filter is the name of one of your clusters, it will list the services in that cluster (eg ecs-clusters test1 | ecs-services)
+2. if your filter is not a cluster name, it will list the services in all clusters whose names match your filter (ie it filters on cluster name not service name)
+3. if you do not pass a filter, it will list all services in all clusters
+
+  $ ecs-clusters test1|ecs-services
+  test1-ecs-admin-7URaUr0YGJHi        ACTIVE  0  0  0  2023-09-13T17:16:48.198000+10:00
+  test1-ecs-public-wEaTAqGXqbpq      ACTIVE  0  0  0  2023-09-13T16:54:54.162000+10:00
+  test1-ecs-hangfire-YNIo1hlx8rjn  ACTIVE  1  1  0  2023-09-13T16:39:06.218000+10:00
+
+
+### ecs-tasks
+
+List ECS tasks
+output includes name:version, createdAt, cpu, memory
+
+gets all tasks if no filter passed in
+if you do pass a filter, it filters on the task name.  All clusters are included (I haven't worked out a way of passing a cluster name AND a filter)
+
+  $ ecs-tasks test2
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-public:18    2023-09-19T17:51:56.418000+10:00  2048  4096
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-admin:20     2023-08-29T10:03:36.956000+10:00  2048  4096
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-hangfire:22  2023-09-19T17:11:06.622000+10:00  1024  2048
+
+
+### ecs-task-details
+
+List ECS tasks
+output includes name:version, taskDefinitionArn, status, createdAt, cpu, memory
+
+gets all tasks if no filter passed in
+if you do pass a filter, it filters on the task name.  All clusters are included (I haven't worked out a way of passing a cluster name AND a filter)
+
+  $ ecs-tasks test2
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-public:18    2023-09-19T17:51:56.418000+10:00  2048  4096
+  5d6a2107-5723-44ac-8cdc-2c0dbeb8f69e       10.156.46.146
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-admin:20     2023-08-29T10:03:36.956000+10:00  2048  4096
+  934e4ca3-3d11-42fb-aadf-483e88f59d7c       10.156.30.66
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-hangfire:22  2023-09-19T17:11:06.622000+10:00  1024  2048
+  6a37c83e-dc85-473c-8a79-7023f85bd052       10.156.54.40
 
 
 ### ecs-scaling-activities
@@ -1972,9 +2245,17 @@ List CloudWatch Log Groups
 
 ### log-group-delete
 
-List CloudWatch Log Groups
+Delete CloudWatch Log Group
 
-    $ log-group-delete [log-group-name] [log-group-name] [log-group-name]
+    $ log-group-delete /aws/lambda/stars
+    You are about to delete the following log groups?
+    /aws/lambda/stars
+    Are you sure? [y/N] y
+    Deleting: /aws/lambda/stars
+    Deleted: /aws/lambda/stars
+
+    You can also pipe the log group names to this command
+    $ log-groups | log-group-delete
 
 
 ## rds-commands
@@ -2020,6 +2301,23 @@ Generate NS records for delegating domain to AWS
     bash-my-aws.org. 300 IN NS	ns-1464.awsdns-55.org.
 
 
+### hosted-zone-records
+
+List Records in a Route53 Hosted Zone
+NOTE: AWS alias records are shown with a fake TTL of 86400.
+
+    $ hosted-zones bash-my-aws.org
+    /hostedzone/ZJ6ZCG2UD6OKX  5  NotPrivateZone  bash-my-aws.org.
+
+    $ hosted-zones bash-my-aws.org | hosted-zone-records
+    bash-my-aws.org.  900 SOA ns-1549.awsdns-01.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400
+    bash-my-aws.org.  300 NS  ns-1464.awsdns-55.org.
+    bash-my-aws.org.  300 A 185.199.108.153
+    bash-my-aws.org.  300 A 185.199.109.153
+    bash-my-aws.org.  300 TXT "google-site-verification=RbKejqu95y4Q78BkWnjaiM0rl6SYugtTdVLexK35b2k"
+    lb.bash-my-aws.org. 86400 ALIAS dualstack.lb-bmaorg-12345.us-east-1.elb.amazonaws.com
+
+
 ### hosted-zone-a-records
 
 Generate NS records for delegating domain to AWS
@@ -2027,6 +2325,18 @@ Generate NS records for delegating domain to AWS
     $ hosted-zone-a-records bash-my-aws.org
 
     $ hosted-zones | hosted-zone-a-records
+
+
+### hosted-zone-delete
+
+Delete Route53 hosted zones
+
+USAGE: hosted-zone-delete hosted-zone-id [hosted-zone-id]
+
+EXAMPLE:
+    $ hosted-zone-delete /hostedzone/Z1111111111111
+    Deleting hosted zone /hostedzone/Z1111111111111
+
 
 
 ## s3-commands
@@ -2078,6 +2388,44 @@ Remove an S3 Bucket, and delete all objects if it's not empty.
     Are you sure you want to continue? y
     delete: s3://another-example-bucket/aliases
     remove_bucket: another-example-bucket
+
+
+### bucket-size
+
+List S3 bucket sizes by storage class using CloudWatch metrics
+
+USAGE: bucket-size [--all] [bucket-name] [bucket-name]
+       echo [bucket-name] | bucket-size [--all]
+
+OPTIONS:
+  --all    Show all storage classes (slower but more comprehensive)
+
+EXAMPLES:
+    $ bucket-size my-bucket
+    my-bucket  STANDARD=15.4GB  STANDARD_IA=0B  GLACIER=2.1GB  DEEP_ARCHIVE=0B
+
+    $ bucket-size --all my-bucket
+    my-bucket  STANDARD=15.4GB  INTELLIGENT_TIERING_FA=0B  INTELLIGENT_TIERING_IA=0B  GLACIER=2.1GB  ...
+
+    $ buckets | bucket-size
+    my-bucket1  STANDARD=15.4GB  STANDARD_IA=0B  GLACIER=2.1GB  DEEP_ARCHIVE=0B
+    my-bucket2  STANDARD=1.2GB   STANDARD_IA=0B  GLACIER=0B     DEEP_ARCHIVE=0B
+
+NOTE: Press CTRL-C to exit early when processing multiple buckets.
+Process arguments
+Get bucket names from arguments or stdin
+Set up trap for CTRL-C with cleaner handling
+Define storage types based on --all flag
+Common storage types (default)
+All storage types
+Set storage types based on flag
+Display names for storage types
+Function to format size in human-readable format
+  format_size
+Create a temporary directory for results
+Process each bucket
+Clean up temporary files
+Reset the trap when we're done
 
 
 ## secretsmanager-commands
@@ -2364,24 +2712,24 @@ Run a command locally on EC2 instance(s) running Windows
     $ ssm-instances Windows | ssm-send-command-windows Get-Hotfix
     Command ID: a0eeeddc-2edf-42bc-b0c7-122f5bc50956
     Waiting for command to complete...
-    i-0fake1234abcd                                                                           
-       Source        Description      HotFixID      InstalledBy          InstalledOn              
-       ------        -----------      --------      -----------          -----------              
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
-       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM     
-       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM    
-       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM    
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM    
-       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM   
-    ---Output truncated---                                                                        
-    i-0fake1234abcd                                                                           
-       Source        Description      HotFixID      InstalledBy          InstalledOn              
-       ------        -----------      --------      -----------          -----------              
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+    i-0fake1234abcd
+       Source        Description      HotFixID      InstalledBy          InstalledOn
+       ------        -----------      --------      -----------          -----------
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM
+       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM
+       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM
+       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM
+    ---Output truncated---
+    i-0fake1234abcd
+       Source        Description      HotFixID      InstalledBy          InstalledOn
+       ------        -----------      --------      -----------          -----------
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
 
     See also: ssm-send-command-windows
 
@@ -2500,6 +2848,7 @@ Print SSM Parameter Value
        "logs_collected": {
          "files": {
    <snip>
+another way to avoid ThrottlingException is to use get-parameters which takes an array of up to 10 params
 
 
 ### instance-ssm-platform-type
@@ -2542,6 +2891,12 @@ List unique set of tag keys in AWS Account / Region
 List unique set of tag values for key in AWS Account / Region
 
     USAGE: tag-values key
+
+
+### tag-split
+
+Split AWS resource tags into one tag per line
+Usage: bma instances | tail -1 | bma instance-tags | tag-split
 
 
 ## target-group-commands
@@ -2707,3 +3062,41 @@ Exclude default VPCs that contain:
     aws --region ap-southeast-2 ec2 delete-subnet --subnet-id=subnet-9eea2c07
     aws --region ap-southeast-2 ec2 delete-subnet --subnet-id=subnet-34fd9cfa
     aws --region ap-southeast-2 ec2 delete-vpc --vpc-id=vpc-018d9739
+
+
+### subnet-ips
+
+List IP addresses for a subnet along with the resources they are allocated to
+
+USAGE: subnet-ips subnet-id [subnet-id...]
+
+EXAMPLE:
+    $ subnet-ips subnet-12345678
+    10.0.1.10  eni-1234567890abcdef  EC2 Instance  i-abcdef1234567890
+    10.0.1.20  eni-0987654321fedcba  RDS Instance  db-foobar
+    10.0.1.30  eni-1a2b3c4d5e6f7g8h  Unknown       unknown
+
+
+### network-interfaces
+
+List network interfaces with key information
+
+USAGE: network-interfaces [filter]
+
+EXAMPLE:
+    $ network-interfaces
+    10.0.1.10  203.0.113.10  eni-1234567890abcdef  subnet-a1b2c3d4  vpc-11223344  in-use  default,web-tier  ELB net/my-nlb/1234567890abcdef
+join(`,`, Groups[].GroupName), # too noisy
+
+
+### vpc-endpoint-policy
+
+Show policy for VPC endpoint(s)
+
+    USAGE: vpc-endpoint-policy vpc-endpoint-id [vpc-endpoint-id]
+
+    $ vpc-endpoints | vpc-endpoint-policy
+    vpce-0123456789abcdef0    {
+                                "Version": "2008-10-17",
+                                "Statement": [...]
+                              }
