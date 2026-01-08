@@ -800,9 +800,9 @@ connector-group-members() {
 # connector-group-instances() {
 #   local cgs=$(skim-stdin "$@")
 #   [[ -z $cgs ]] && __bma_usage "CONNECTOR_GROUP [CONNECTOR_GROUP]" && return 1
-# 
+#
 #   for cg in cgs; do
-# 
+#
 #       ssm-instances \
 #       | rg -f <( connector-group-members "$cg" | cut -f3)
 #   done
@@ -868,7 +868,7 @@ afd-endpoints() {
       --profile-name "$profile" \
       --output tsv \
       --query "[].[
-        name, 
+        name,
         enabledState,
         hostName,
         '$profile'
@@ -895,9 +895,9 @@ afd-routes() {
         --endpoint-name "$endpoint" \
         --output tsv \
         --query "[].[
-          name, 
-          hostName, 
-          domainValidationState, 
+          name,
+          hostName,
+          domainValidationState,
           validationProperties.validationToken,
           '$profile',
           '$endpoint'
@@ -1203,10 +1203,10 @@ private-dns-zone-record-sets() {
       --zone-name "$zone" \
       --query "[].[
         '$zone',
-        name, 
-        type, 
-        ttl, 
-        join(',', [aRecords[].ipv4Address][]), 
+        name,
+        type,
+        ttl,
+        join(',', [aRecords[].ipv4Address][]),
         resourceGroup,
         fqdn
       ]" \
@@ -1266,7 +1266,7 @@ private-endpoint-custom-dns-configs() {
   #
   # Usage: private-endpointcustom-dns-configs
 
-  local private_endpoints private_endpoint 
+  local private_endpoints private_endpoint
   private_endpoints="$(skim-stdin "$@")"
   [[ -z $private_endpoints ]] && __bma_usage "PRIVATE_ENDPOINT [PRIVATE_ENDPOINT]" && return 1
 

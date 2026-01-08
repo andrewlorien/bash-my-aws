@@ -423,7 +423,7 @@ subnet-ips() {
       --output text | while read -r ip eni instance_id description; do
         resource_type="Unknown"
         resource_id="unknown"
-        
+
         if [[ $description == *"ELB"* ]]; then
           resource_type="Load Balancer"
           resource_id=$(echo $description | awk '{print $2}')
@@ -489,7 +489,7 @@ vpc-endpoint-policy() {
       --vpc-endpoint-ids "$vpc_endpoint_id" \
       --query "VpcEndpoints[0].PolicyDocument" \
       --output text)
-    
+
     # Pretty print the JSON policy
     echo "$vpc_endpoint_id    $(echo "$policy" | jq '.' | sed '2,$s/^/                               /')"
   done

@@ -26,7 +26,7 @@ ecs-clusters() {
     --clusters $(aws ecs list-clusters --query "clusterArns[?contains(@, \`${cluster}\`) == \`true\`]" --output text) \
     --query "clusters[].[clusterName,status,activeServicesCount,runningTasksCount,pendingTasksCount]" \
     --output text       |
-    LC_ALL=C sort -b -k 2|
+    LC_ALL=C sort -b -k 2 |
     columnise
 }
 

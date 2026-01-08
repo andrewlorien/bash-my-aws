@@ -1264,7 +1264,7 @@ stack-drift-detect() {
   # Create temporary directory for results
   local tmp_dir=$(mktemp -d)
   trap "rm -rf $tmp_dir" EXIT
-  
+
   local stack_name
   for stack_name in $stack_names; do
     (
@@ -1275,24 +1275,24 @@ stack-drift-detect() {
           --output text \
           --query 'StackDriftDetectionId' 2>/dev/null
       )
-      
+
       if [[ -z "$drift_detection_id" ]]; then
         echo "$stack_name	ERROR	FAILED_TO_INITIATE" > "$tmp_dir/$stack_name.result"
       else
         echo "$stack_name	$drift_detection_id	DETECTION_IN_PROGRESS" > "$tmp_dir/$stack_name.result"
       fi
     ) &
-    
+
     # Limit the number of parallel processes to avoid overwhelming the API
     # AWS rate limits: 20 requests per second for detect-stack-drift
     if [[ $(jobs -r | wc -l) -ge 10 ]]; then
       wait -n
     fi
   done
-  
+
   # Wait for all background jobs to complete
   wait
-  
+
   # Collect and display results in order
   for stack_name in $stack_names; do
     if [[ -f "$tmp_dir/$stack_name.result" ]]; then
@@ -1318,7 +1318,7 @@ stack-drift-status() {
   # Create temporary directory for results
   local tmp_dir=$(mktemp -d)
   trap "rm -rf $tmp_dir" EXIT
-  
+
   local stack_name
   for stack_name in $stack_names; do
     (
@@ -1334,17 +1334,17 @@ stack-drift-status() {
           ]' 2>/dev/null > "$tmp_dir/$stack_name.result" || \
           echo "$stack_name	ERROR	STACK_NOT_FOUND" > "$tmp_dir/$stack_name.result"
     ) &
-    
+
     # Limit the number of parallel processes to avoid overwhelming the API
     # AWS rate limits: describe-stacks can handle higher concurrency
     if [[ $(jobs -r | wc -l) -ge 20 ]]; then
       wait -n
     fi
   done
-  
+
   # Wait for all background jobs to complete
   wait
-  
+
   # Collect and display results in order
   for stack_name in $stack_names; do
     if [[ -f "$tmp_dir/$stack_name.result" ]]; then
@@ -1374,7 +1374,7 @@ stack-drift-resources() {
   # Create temporary directory for results
   local tmp_dir=$(mktemp -d)
   trap "rm -rf $tmp_dir" EXIT
-  
+
   local stack_name
   for stack_name in $stack_names; do
     (
@@ -1385,7 +1385,7 @@ stack-drift-resources() {
           --output text \
           --query 'Stacks[0].DriftInformation.StackDriftStatus' 2>/dev/null
       )
-      
+
       if [[ -z "$drift_status" ]] || [[ "$drift_status" == "None" ]]; then
         echo "$stack_name	ERROR	STACK_NOT_FOUND" > "$tmp_dir/$stack_name.result"
       elif [[ "$drift_status" == "NOT_CHECKED" ]]; then
@@ -1407,7 +1407,7 @@ stack-drift-resources() {
               Timestamp,
               join(`,`, PropertyDifferences[].PropertyPath) || `RESOURCE_DELETED`
             ]' 2>/dev/null > "$temp_file"
-        
+
         if [[ -s "$temp_file" ]]; then
           # Process drift results
           while IFS=$'\t' read -r logical_id resource_type drift_status timestamp properties; do
@@ -1419,17 +1419,17 @@ stack-drift-resources() {
         fi
       fi
     ) &
-    
+
     # Limit the number of parallel processes
     # This makes two API calls per stack, so use lower concurrency
     if [[ $(jobs -r | wc -l) -ge 10 ]]; then
       wait -n
     fi
   done
-  
+
   # Wait for all background jobs to complete
   wait
-  
+
   # Collect and display results in order
   for stack_name in $stack_names; do
     if [[ -f "$tmp_dir/$stack_name.result" ]]; then
