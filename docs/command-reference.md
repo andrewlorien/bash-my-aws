@@ -1511,42 +1511,6 @@ List logging status of Cloudtrails
     USAGE: cloudtrail-status cloudtrail [cloudtrail]
 
 
-## codedeploy-commands
-
-
-### deployment
-
-List deployments
-
-
-### deployments
-
-List all deployment IDs for a deployment group (not useful for the user, only internal)
-# ?? if no deployment group, could we list all deployments for this application, with their groups and statuses?
-
-
-### deployment-groups
-
-List all deployment groups for an application
-
-
-## codedeploy-commands.bak
-
-
-### deployment
-
-List deployments
-
-
-### deployments
-
-List all deployment IDs for a deployment group (not useful for the user, only internal)
-# ?? if no deployment group, could we list all deployments for this application, with their groups and statuses?
-
-
-### deployment-groups
-
-List all deployment groups for an application
 ## cloudwatch-commands
 
 
@@ -1578,6 +1542,25 @@ List Cloudwatch Alarms
 
 ### cloudwatch-alarm-actions-enable
 
+
+
+## codedeploy-commands
+
+
+### deployment
+
+List deployments
+
+
+### deployments
+
+List all deployment IDs for a deployment group (not useful for the user, only internal)
+# ?? if no deployment group, could we list all deployments for this application, with their groups and statuses?
+
+
+### deployment-groups
+
+List all deployment groups for an application
 
 
 ## domain-commands
@@ -1667,6 +1650,88 @@ if you do pass a filter, it filters on the task name.  All clusters are included
   arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-public:18    2023-09-19T17:51:56.418000+10:00  2048  4096
   arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-admin:20     2023-08-29T10:03:36.956000+10:00  2048  4096
   arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-hangfire:22  2023-09-19T17:11:06.622000+10:00  1024  2048
+
+
+### ecs-scaling-activities
+
+List autoscaling activities - the actual scaling events that have happened
+eg
+ecs-scaling www
+2023-11-22T06:24:50.937000+11:00        www-ecs-public-ServicePublic-OuN3rXBLvmx3-AlarmLow-64de4512-d901-4b26-a6a2-184bb1e90bc6 in state ALARM triggered policy www-ecs-public-target-tracking-mem70     Successfully set desired count to 2. Change successfully fulfilled by ecs.
+2023-11-22T05:25:48.611000+11:00        www-ecs-public-ServicePublic-OuN3rXBLvmx3-AlarmHigh-6408c172-647e-4c0e-aac9-a800cd83317d in state ALARM triggered policy www-ecs-public-target-tracking-mem70    Successfully set desired count to 3. Change successfully fulfilled by ecs.
+
+
+### ecs-scaling-actions
+
+List autoscaling actions - cron-based scheduled scaling
+filter by environment (eg test1) or namespace (eg ecs)
+if you pass an argument, it'll filter for clusters whose ARN contains your text
+
+  $ scaling-ecs 'test.*down'     # list the scale-down times of all our test environments
+
+
+## ecs-commands~
+
+
+### ecs-clusters
+
+List ECS clusters
+output includes clusterName,status,activeServicesCount,runningTasksCount,pendingTasksCount
+if you pass an argument, it'll filter for clusters whose ARN contains your text
+
+  $ ecs-clusters test
+  test-octopus-ecs-cluster  ACTIVE  1  1  0
+  test1-ecs-cluster        ACTIVE  3  1  0
+  test3-ecs-cluster        ACTIVE  3  1  0
+  test2-ecs-cluster        ACTIVE  3  3  0
+
+
+### ecs-services
+
+List ECS services
+output includes serviceName,status,desiredCount,runningCount,pendingCount,createdAt
+
+gets all clusters if no filter passed in
+if you do pass a filter:
+1. if your filter is the name of one of your clusters, it will list the services in that cluster (eg ecs-clusters test1 | ecs-services)
+2. if your filter is not a cluster name, it will list the services in all clusters whose names match your filter (ie it filters on cluster name not service name)
+3. if you do not pass a filter, it will list all services in all clusters
+
+  $ ecs-clusters test1|ecs-services
+  test1-ecs-admin-7URaUr0YGJHi        ACTIVE  0  0  0  2023-09-13T17:16:48.198000+10:00
+  test1-ecs-public-wEaTAqGXqbpq      ACTIVE  0  0  0  2023-09-13T16:54:54.162000+10:00
+  test1-ecs-hangfire-YNIo1hlx8rjn  ACTIVE  1  1  0  2023-09-13T16:39:06.218000+10:00
+
+
+### ecs-tasks
+
+List ECS tasks
+output includes name:version, createdAt, cpu, memory
+
+gets all tasks if no filter passed in
+if you do pass a filter, it filters on the task name.  All clusters are included (I haven't worked out a way of passing a cluster name AND a filter)
+
+  $ ecs-tasks test2
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-public:18    2023-09-19T17:51:56.418000+10:00  2048  4096
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-admin:20     2023-08-29T10:03:36.956000+10:00  2048  4096
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-hangfire:22  2023-09-19T17:11:06.622000+10:00  1024  2048
+
+
+### ecs-task-details
+
+List ECS tasks
+output includes name:version, taskDefinitionArn, status, createdAt, cpu, memory
+
+gets all tasks if no filter passed in
+if you do pass a filter, it filters on the task name.  All clusters are included (I haven't worked out a way of passing a cluster name AND a filter)
+
+  $ ecs-tasks test2
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-public:18    2023-09-19T17:51:56.418000+10:00  2048  4096
+  5d6a2107-5723-44ac-8cdc-2c0dbeb8f69e       10.156.46.146
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-admin:20     2023-08-29T10:03:36.956000+10:00  2048  4096
+  934e4ca3-3d11-42fb-aadf-483e88f59d7c       10.156.30.66
+  arn:aws:ecs:ap-southeast-2:xxxxxxxxxxxx:task-definition/test2-hangfire:22  2023-09-19T17:11:06.622000+10:00  1024  2048
+  6a37c83e-dc85-473c-8a79-7023f85bd052       10.156.54.40
 
 
 ### ecs-scaling-activities
@@ -2180,9 +2245,17 @@ List CloudWatch Log Groups
 
 ### log-group-delete
 
-List CloudWatch Log Groups
+Delete CloudWatch Log Group
 
-    $ log-group-delete [log-group-name] [log-group-name] [log-group-name]
+    $ log-group-delete /aws/lambda/stars
+    You are about to delete the following log groups?
+    /aws/lambda/stars
+    Are you sure? [y/N] y
+    Deleting: /aws/lambda/stars
+    Deleted: /aws/lambda/stars
+
+    You can also pipe the log group names to this command
+    $ log-groups | log-group-delete
 
 
 ## rds-commands
@@ -2228,6 +2301,23 @@ Generate NS records for delegating domain to AWS
     bash-my-aws.org. 300 IN NS	ns-1464.awsdns-55.org.
 
 
+### hosted-zone-records
+
+List Records in a Route53 Hosted Zone
+NOTE: AWS alias records are shown with a fake TTL of 86400.
+
+    $ hosted-zones bash-my-aws.org
+    /hostedzone/ZJ6ZCG2UD6OKX  5  NotPrivateZone  bash-my-aws.org.
+
+    $ hosted-zones bash-my-aws.org | hosted-zone-records
+    bash-my-aws.org.  900 SOA ns-1549.awsdns-01.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400
+    bash-my-aws.org.  300 NS  ns-1464.awsdns-55.org.
+    bash-my-aws.org.  300 A 185.199.108.153
+    bash-my-aws.org.  300 A 185.199.109.153
+    bash-my-aws.org.  300 TXT "google-site-verification=RbKejqu95y4Q78BkWnjaiM0rl6SYugtTdVLexK35b2k"
+    lb.bash-my-aws.org. 86400 ALIAS dualstack.lb-bmaorg-12345.us-east-1.elb.amazonaws.com
+
+
 ### hosted-zone-a-records
 
 Generate NS records for delegating domain to AWS
@@ -2235,6 +2325,8 @@ Generate NS records for delegating domain to AWS
     $ hosted-zone-a-records bash-my-aws.org
 
     $ hosted-zones | hosted-zone-a-records
+
+
 ### hosted-zone-delete
 
 Delete Route53 hosted zones
@@ -2405,24 +2497,24 @@ Run a command locally on EC2 instance(s) running Windows
     $ ssm-instances Windows | ssm-send-command-windows Get-Hotfix
     Command ID: a0eeeddc-2edf-42bc-b0c7-122f5bc50956
     Waiting for command to complete...
-    i-0fake1234abcd
-       Source        Description      HotFixID      InstalledBy          InstalledOn
-       ------        -----------      --------      -----------          -----------
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
-       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM
-       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM
-       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM
-       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM
-    ---Output truncated---
-    i-0fake1234abcd
-       Source        Description      HotFixID      InstalledBy          InstalledOn
-       ------        -----------      --------      -----------          -----------
-       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM
-       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
-       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM
+    i-0fake1234abcd                                                                           
+       Source        Description      HotFixID      InstalledBy          InstalledOn              
+       ------        -----------      --------      -----------          -----------              
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+       FAKEAPP01234  Update           KB2345678     NT AUTHORITY\SYSTEM  1/9/2019 12:00:00 AM     
+       FAKEAPP01234  Update           KB3456789     NT AUTHORITY\SYSTEM  3/11/2021 12:00:00 AM    
+       FAKEAPP01234  Security Update  KB4567890     NT AUTHORITY\SYSTEM  4/21/2019 12:00:00 AM    
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  5/15/2019 12:00:00 AM    
+       FAKEAPP01234  Security Update  KB6789012     NT AUTHORITY\SYSTEM  6/12/2019 12:00:00 AM   
+    ---Output truncated---                                                                        
+    i-0fake1234abcd                                                                           
+       Source        Description      HotFixID      InstalledBy          InstalledOn              
+       ------        -----------      --------      -----------          -----------              
+       FAKEAPP01234  Update           KB1234567     NT AUTHORITY\SYSTEM  10/11/2023 12:00:00 AM   
+       FAKEAPP01234  Update           KB8901234     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
+       FAKEAPP01234  Security Update  KB5678901     NT AUTHORITY\SYSTEM  12/12/2018 12:00:00 AM   
 
     See also: ssm-send-command-windows
 
@@ -2756,6 +2848,7 @@ Print SSM Parameter Value
        "logs_collected": {
          "files": {
    <snip>
+another way to avoid ThrottlingException is to use get-parameters which takes an array of up to 10 params
 
 
 ### instance-ssm-platform-type
