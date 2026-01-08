@@ -52,10 +52,10 @@ ecs-services() {
 #  check for input that isn't a valid cluster name and use it as a regex...
   if [[ -z "$cluster_names" || "$(aws ecs describe-clusters --clusters $cluster_names --query "failures[].reason" --output text)" == "MISSING" ]]; then
     echo "cluster not found, using input to search"
-    cluster_names=$(ecs-clusters2 $cluster_names |skim-stdin)
+    cluster_names=$(ecs-clusters $cluster_names |skim-stdin)
     if [[ -z "$cluster_names" ]]; then
       echo "no matching cluster, using input as a service filter"
-      cluster_names=$(ecs-clusters2 |skim-stdin)
+      cluster_names=$(ecs-clusters |skim-stdin)
       service_filter=$filter
     fi
   fi
@@ -119,7 +119,7 @@ ecs-tasks() {
 
   local filter=$(skim-stdin "$@")
 
-  for cluster_name in $(ecs-clusters2 |skim-stdin); do
+  for cluster_name in $(ecs-clusters |skim-stdin); do
    #echo "cluster_name=$cluster_name"
    # TODO: remove the account bit from the task definition, ie print gc3-test1-public:27 instead of arn:aws:ecs:ap-southeast-2:167642850091:task-definition/gc3-test1-public:27
       aws ecs describe-tasks            \
@@ -144,7 +144,7 @@ ecs-tasks() {
 
 ecs-scaling-activities() {
 
-  # LIst autoscaling activities - the actual scaling events that have happened
+  # List autoscaling activities - the actual scaling events that have happened
   # eg
   # ecs-scaling www
   # 2023-11-22T06:24:50.937000+11:00        www-ecs-public-ServicePublic-OuN3rXBLvmx3-AlarmLow-64de4512-d901-4b26-a6a2-184bb1e90bc6 in state ALARM triggered policy www-ecs-public-target-tracking-mem70     Successfully set desired count to 2. Change successfully fulfilled by ecs.
@@ -187,5 +187,6 @@ ecs-scaling-actions() {
     --query "ScheduledActions[].[ScheduledActionName,Schedule,ScalableTargetAction.MinCapacity,ScalableTargetAction.MaxCapacity]" \
     --output text       |
     grep -E -- "$filters" |
+    LC_ALL=C sort -k 1 |
     columnise
 }
